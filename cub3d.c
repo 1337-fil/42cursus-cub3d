@@ -108,8 +108,14 @@ void		castVertRay(float rayAngle)
 	}
 }
 
+/*
+**	my comments start with  //! 
+*/
+
 void		init_tex()
 {
+	//! i guess this is useless thing cuz mlx get data address already return a pointer
+	//! and malloc it
 	g_tex.wallTexture = (int *)malloc(sizeof(int) *
 						(int)TEX_WIDTH * (int)TEX_HEIGHT);
 	// g_tex.ptr's 2nd argument should get changed depending not always NO
@@ -117,6 +123,18 @@ void		init_tex()
 	// to draw textures depending on the rays...
 	g_tex.ptr = mlx_xpm_file_to_image(g_mlx.mlx_ptr, g_data.paths.no, &g_tex.img_width, &g_tex.img_height);
 	g_tex.wallTexture = (int *)mlx_get_data_addr(g_tex.ptr, &g_mlx.bpp, &g_mlx.size_line, &g_mlx.endian);
+	//! im gonna add somr shit here for testing normally you should store all ur textures somewhere
+	tempimage	= mlx_xpm_file_to_image(g_mlx.mlx_ptr, g_data.paths.we, &g_tex.img_width, &g_tex.img_height);
+	g_textwest = (int *)mlx_get_data_addr(tempimage, &g_mlx.bpp, &g_mlx.size_line, &g_mlx.endian);
+	//! setting up textures
+	tempimage	= mlx_xpm_file_to_image(g_mlx.mlx_ptr, g_data.paths.ea, &g_tex.img_width, &g_tex.img_height);
+	g_texteast = (int *)mlx_get_data_addr(tempimage, &g_mlx.bpp, &g_mlx.size_line, &g_mlx.endian);
+	//! same as above
+	tempimage	= mlx_xpm_file_to_image(g_mlx.mlx_ptr, g_data.paths.no, &g_tex.img_width, &g_tex.img_height);
+	g_textnorth = (int *)mlx_get_data_addr(tempimage, &g_mlx.bpp, &g_mlx.size_line, &g_mlx.endian);
+	//! guess what 
+	tempimage	= mlx_xpm_file_to_image(g_mlx.mlx_ptr, g_data.paths.so, &g_tex.img_width, &g_tex.img_height);
+	g_textsouth = (int *)mlx_get_data_addr(tempimage, &g_mlx.bpp, &g_mlx.size_line, &g_mlx.endian);
 
 	// Initialise struct variables
 	g_tex.texOffSetX = 0;
@@ -145,7 +163,12 @@ void		render3DProjectionPlane(int i)
 		img_update(i, y, 0x404040);
 		y++;
 	}
-	
+	DEB(g_data.paths.no)
+	DEB(g_data.paths.ea)
+	DEB(g_data.paths.we)
+	DEB(g_data.paths.so)
+	//! so here where the magic happen
+	//! i wish if u told me where to find the texture data 
 	// Draw walls
 	y = wallTopPixel;
 	if (g_rays[i].wasHitVertical)	// Calculate textureOffSetX if wallHit was Vert
@@ -157,8 +180,26 @@ void		render3DProjectionPlane(int i)
 		g_tex.distanceFromTop = y + (wallStripHeight / 2) - (WIN_HEIGHT / 2);
 		g_tex.texOffSetY = g_tex.distanceFromTop * ((float)TEX_HEIGHT / wallStripHeight);
 		// Set texture
-		g_tex.texelColor = g_tex.wallTexture[(TEX_WIDTH * g_tex.texOffSetY) + g_tex.texOffSetX];
-		img_update(i, y, g_tex.texelColor); // Function that za3im told me to use
+		if (RAYS(i).isRayFacingDown && !RAYS(i).wasHitVertical)
+		{
+			g_tex.texelColor = g_textnorth[(TEX_WIDTH * g_tex.texOffSetY) + g_tex.texOffSetX];
+			img_update(i, y, g_tex.texelColor); // Function that za3im told me to use
+		}
+		else if (RAYS(i).isRayFacingUp && !RAYS(i).wasHitVertical)
+		{
+			g_tex.texelColor = g_textsouth[(TEX_WIDTH * g_tex.texOffSetY) + g_tex.texOffSetX];
+			img_update(i, y, g_tex.texelColor); // Function that za3im told me to use
+		}
+		else if (RAYS(i).isRayFacingLeft && RAYS(i).wasHitVertical)
+		{
+			g_tex.texelColor = g_textwest[(TEX_WIDTH * g_tex.texOffSetY) + g_tex.texOffSetX];
+			img_update(i, y, g_tex.texelColor); // Function that za3im told me to use
+		}
+		else if (RAYS(i).isRayFacingRight && RAYS(i).wasHitVertical)
+		{
+			g_tex.texelColor = g_texteast[(TEX_WIDTH * g_tex.texOffSetY) + g_tex.texOffSetX];
+			img_update(i, y, g_tex.texelColor); // Function that za3im told me to use
+		}
 		y++;
 	}
 

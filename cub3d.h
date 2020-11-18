@@ -267,4 +267,15 @@ void		draw_line(int X0, int Y0, int X1, int Y1, int color);
 // 3D FUNCTIONS
 void		render3DProjectionPlane(int i);
 
+
+
+
+//! My macros and variables
+#define 	RAYS(x) g_rays[i]
+#define DEB(X)    printf("\033[1;31m\n	DEBUGGING : |%s|\n\033[0m", X);// exit(1);
+int			*g_textnorth;
+int			*g_textwest;
+int			*g_texteast;
+int			*g_textsouth;
+void		*tempimage;
 #endif
